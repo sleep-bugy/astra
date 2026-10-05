@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pavelc4/astra/internal/errors"
 	"github.com/pavelc4/astra/internal/httpclient"
 )
 
@@ -95,8 +96,10 @@ func (c *IGClient) getJSON(ctx context.Context, url string) ([]byte, error) {
 			return nil, fmt.Errorf("instagram rate-limited (feedback_required) — back off / try later or a different IP")
 		case strings.Contains(body, "login_required") || strings.Contains(body, "checkpoint"):
 			return nil, fmt.Errorf("instagram %d: login/checkpoint required — cookie expired or invalid", resp.StatusCode)
+		case strings.Contains(body, "Media not found") || strings.Contains(body, "unavailable") || strings.Contains(body, "media_not_found"):
+			return nil, errors.NewNotFound("instagram media not found or unavailable (post may be deleted or private)")
 		default:
-			return nil, fmt.Errorf("instagram returned %d", resp.StatusCode)
+			return nil, fmt.Errorf("instagram returned %d: %s", resp.StatusCode, body)
 		}
 	}
 

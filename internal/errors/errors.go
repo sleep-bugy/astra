@@ -35,3 +35,7 @@ func NewInvalidURL(msg string) *AppError {
 func NewUpstream(msg string) *AppError {
 	return &AppError{Message: msg, Code: CodeUpstreamError, Status: 502}
 }
+
+func NewNotFound(msg string) *AppError {
+	return &AppError{Message: msg, Code: CodeNotFound, Status: 404}
+}
